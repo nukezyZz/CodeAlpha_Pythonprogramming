@@ -1,0 +1,96 @@
+import os
+import shutil
+
+# Define the file organization mapping: Extension -> Folder Name
+# This fulfills the goal of automating a small, real-life repetitive task.
+FILE_CATEGORIES = {
+    # Documents
+    '.pdf': 'DOCUMENTS/PDFs',
+    '.doc': 'DOCUMENTS/Word',
+    '.docx': 'DOCUMENTS/Word',
+    '.txt': 'DOCUMENTS/Text',
+    '.xls': 'DOCUMENTS/Spreadsheets',
+    '.xlsx': 'DOCUMENTS/Spreadsheets',
+    
+    # Images
+    '.jpg': 'IMAGES',
+    '.jpeg': 'IMAGES',
+    '.png': 'IMAGES',
+    '.gif': 'IMAGES',
+    
+    # Videos
+    '.mp4': 'VIDEOS',
+    '.mov': 'VIDEOS',
+    
+    # Audio
+    '.mp3': 'AUDIO',
+    '.wav': 'AUDIO',
+    
+    # Code & Archives
+    '.py': 'CODE/Python',
+    '.html': 'CODE/Web',
+    '.css': 'CODE/Web',
+    '.zip': 'ARCHIVES',
+    '.rar': 'ARCHIVES'
+}
+
+def organize_files(source_dir):
+    """
+    Moves files from the source_dir into categorized subfolders.
+    """
+    if not os.path.isdir(source_dir):
+        print(f"Error: Source directory **{source_dir}** does not exist.")
+        return
+
+    print(f"--- Starting file organization in: **{source_dir}** ---")
+    
+    files_moved = 0
+    
+    try:
+        # Loop through all items in the directory
+        for filename in os.listdir(source_dir):
+            source_path = os.path.join(source_dir, filename)
+            
+            # Skip directories and the script itself
+            if os.path.isdir(source_path) or filename == os.path.basename(__file__):
+                continue
+
+            # Split the file name into the name and extension
+            name, extension = os.path.splitext(filename)
+            extension = extension.lower()
+
+            # Find the destination folder based on the extension
+            destination_folder = FILE_CATEGORIES.get(extension, 'OTHER_FILES') # Default to 'OTHER_FILES'
+
+            # Full path for the destination folder
+            dest_folder_path = os.path.join(source_dir, destination_folder)
+
+            # 1. Create the destination directory if it doesn't exist
+            if not os.path.exists(dest_folder_path):
+                os.makedirs(dest_folder_path)
+                print(f"Created directory: {destination_folder}")
+
+            # 2. Define the final destination path for the file
+            destination_path = os.path.join(dest_folder_path, filename)
+
+            # 3. Move the file
+            shutil.move(source_path, destination_path)
+            files_moved += 1
+            
+        print(f"\n--- Organization Complete! Moved **{files_moved}** files. ---")
+
+    except Exception as e:
+        print(f"\nAn error occurred during organization: {e}")
+
+
+if __name__ == '__main__':
+    # *** IMPORTANT: Change this path to the directory you want to organize (e.g., your 'Downloads' folder) ***
+    target_directory = os.getcwd() # By default, uses the current working directory
+    
+    print(f"NOTE: The script is currently targeting the path: **{target_directory}**")
+    user_confirmation = input("Proceed with organization? (y/n): ").lower()
+    
+    if user_confirmation == 'y':
+        organize_files(target_directory)
+    else:
+        print("Operation cancelled by the user.")
