@@ -1,0 +1,82 @@
+CURRENT_PRICES = {
+    "AAPL": 180.00,
+    "TSLA": 250.00,
+    "GOOG": 150.50,
+    "MSFT": 400.75,
+    "AMZN": 175.90
+}
+
+def track_portfolio():
+    portfolio = []
+    print("--- Simple Stock Portfolio Tracker ---")
+    
+    while True:
+        ticker = input("\nEnter Stock Ticker (e.g., AAPL) or type 'DONE' to finish: ").upper()
+        
+        if ticker == 'DONE':
+            break
+
+        if ticker not in CURRENT_PRICES:
+            print(f"Error: Ticker **{ticker}** not found. Please use one of: {', '.join(CURRENT_PRICES.keys())}")
+            continue
+
+        try:
+            quantity = int(input(f"Enter quantity of shares for {ticker}: "))
+            purchase_price = float(input(f"Enter original purchase price per share for {ticker}: $"))
+            
+            if quantity <= 0 or purchase_price <= 0:
+                print("Quantity and price must be positive numbers.")
+                continue
+
+            portfolio.append({
+                'ticker': ticker,
+                'quantity': quantity,
+                'purchase_price': purchase_price
+            })
+            print(f"Added {quantity} shares of {ticker} to portfolio.")
+
+        except ValueError:
+            print("Invalid input. Please enter valid numbers for quantity and price.")
+            
+    if not portfolio:
+        print("\nNo stocks added. Exiting tracker.")
+        return
+
+    # --- Calculation and Output ---
+    total_investment = 0.0
+    total_market_value = 0.0
+
+    print("\n" + "="*50)
+    print("           PORTFOLIO SUMMARY")
+    print("="*50)
+    
+    for stock in portfolio:
+        ticker = stock['ticker']
+        qty = stock['quantity']
+        pp = stock['purchase_price']
+        cp = CURRENT_PRICES.get(ticker) # Current price
+
+        investment_value = qty * pp
+        market_value = qty * cp
+        
+        total_investment += investment_value
+        total_market_value += market_value
+        
+        print(f"\n**{ticker}** ({qty} shares):")
+        print(f"  - Total Investment: ${investment_value:,.2f} (Bought at ${pp:,.2f})")
+        print(f"  - Current Value:    ${market_value:,.2f} (Current Price: ${cp:,.2f})")
+
+    # Display final totals
+    print("\n" + "="*50)
+    print(f"TOTAL CAPITAL INVESTED:  ${total_investment:,.2f}")
+    print(f"TOTAL CURRENT VALUE:     ${total_market_value:,.2f}")
+    
+    # Calculate difference (Profit/Loss)
+    profit_loss = total_market_value - total_investment
+    status = "PROFIT" if profit_loss >= 0 else "LOSS"
+    
+    print(f"NET GAIN/LOSS ({status}): ${profit_loss:,.2f}")
+    print("="*50)
+
+if __name__ == '__main__':
+    track_portfolio()
